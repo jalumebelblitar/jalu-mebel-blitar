@@ -4,8 +4,22 @@
       "name": "Pintu Kamar Kayu Jati",
       "category": "Pintu",
       "price": "Rp400.000 - Rp1.200.000",
-      "image": "",
-      "desc": "Pilihan pintu kamar dengan material kayu jati berkualitas."
+      "image": "/images/14067.jpg",
+      "desc": "Pilihan pintu kamar dengan material kayu jati berkualitas dan kering"
+    },
+    {
+      "name": "Jendela jati",
+      "category": "Pintu",
+      "price": "1.800.000",
+      "image": "/images/16873.jpg",
+      "desc": "Pintu kupu tarung 120 x 200 harga 1.800.000"
+    },
+    {
+      "name": "Pintu jati kering",
+      "category": "Pintu",
+      "price": "1.800.000",
+      "image": "/images/16891.jpg",
+      "desc": "Pintu kupu tarung 120 x 200 dari kayu kering"
     }
   ]
 }
