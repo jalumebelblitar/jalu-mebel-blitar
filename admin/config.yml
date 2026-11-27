@@ -1,0 +1,26 @@
+backend:
+  name: github
+  repo: jalumebelblitar/jalu-mebel-blitar
+  branch: main
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "katalog"
+    label: "Katalog Produk Mebel"
+    files:
+      - name: "produk"
+        label: "Daftar Semua Produk"
+        file: "products.json"
+        fields:
+          - name: "items"
+            label: "Daftar Produk"
+            widget: "list"
+            fields:
+              - { label: "Nama Produk", name: "name", widget: "string" }
+              - { label: "Kategori", name: "category", widget: "select", options: ["Pintu", "Jendela", "Kusen"] }
+              - { label: "Harga", name: "price", widget: "string", hint: "Contoh: Rp500.000 - Rp1.200.000" }
+              - { label: "Foto Produk", name: "image", widget: "image", required: false }
+              - { label: "Deskripsi Singkat", name: "desc", widget: "text" }
+              
