@@ -21,6 +21,12 @@ collections:
               - { label: "Nama Produk", name: "name", widget: "string" }
               - { label: "Kategori", name: "category", widget: "select", options: ["Pintu", "Jendela", "Kusen"] }
               - { label: "Harga", name: "price", widget: "string", hint: "Contoh: Rp500.000 - Rp1.200.000" }
-              - { label: "Foto Produk", name: "image", widget: "image", required: false }
+              - { label: "Foto Produk", name: "image", widget: "image", required: false }        
+              - label: "Galeri Foto Tambahan"
+                name: "gallery"
+                widget: "list"
+                required: false
+                field: { label: "Foto", name: "photo", widget: "image" }
+                
               - { label: "Deskripsi Singkat", name: "desc", widget: "text" }
               
