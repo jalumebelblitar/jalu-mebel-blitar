@@ -160,6 +160,85 @@
     categoryEl.addEventListener("change", render);
     document.getElementById("year").textContent = new Date().getFullYear();
     loadProducts();
-  </script>
-</body>
-</html>
+<div class="modal" id="imgModal" role="dialog" aria-modal="true" style="z-index:60">
+  <div class="modal-box" style="width:min(720px,100%);padding:18px;text-align:center">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <strong id="lbTitle" style="font:600 18px Georgia,serif"></strong>
+      <button class="btn light" type="button" id="closeImgModal" style="padding:6px 12px">✕ Tutup</button>
+    </div>
+    <div style="position:relative;background:#f4f1ea;border-radius:10px;overflow:hidden;min-height:260px;display:grid;place-items:center">
+      <button type="button" id="lbPrev" style="position:absolute;left:10px;background:rgba(255,255,255,.9);border:0;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)">‹</button>
+      <img id="lbMainImg" src="" alt="" style="max-height:62vh;max-width:100%;object-fit:contain;display:block">
+      <button type="button" id="lbNext" style="position:absolute;right:10px;background:rgba(255,255,255,.9);border:0;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)">›</button>
+    </div>
+    <div id="lbThumbs" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px"></div>
+    <div id="lbInfo" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+    <div style="margin-top:14px"><button class="btn" type="button" id="lbOrderBtn" style="width:100%">Pesan Produk Ini via WhatsApp</button></div>
+  </div>
+</div>
+<script>
+const WA_NUMBER = "6285790774518";
+let catalog = [], lbPhotos = [], lbIdx = 0, lbCurrentId = null;
+const productsEl = document.getElementById("products"), searchEl = document.getElementById("search"), categoryEl = document.getElementById("category");
+const st = document.createElement("style");
+st.textContent = `.product-visual{height:230px!important;background:#f3efe6!important;cursor:pointer}.product-visual.has-img:before,.product-visual.has-img:after{display:none!important}.product-visual img{width:100%;height:100%;object-fit:contain;display:block}.zoom-badge{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;color:#263c30}`;
+document.head.appendChild(st);
+
+async function loadProducts() {
+  try {
+    const res = await fetch("products.json?t=" + Date.now());
+    const data = await res.json();
+    catalog = (data.items || []).map((item, idx) => {
+      const mainImg = item.image ? item.image.replace(/^\//, "") : "";
+      const extraImgs = Array.isArray(item.gallery) ? item.gallery.map(g => (typeof g === "string" ? g : g.photo || "").replace(/^\//, "")).filter(Boolean) : [];
+      const allPhotos = [mainImg, ...extraImgs].filter(Boolean);
+      return {
+        id: idx + 1, name: item.name || "Produk",
+        category: (item.category || "pintu").toLowerCase(),
+        categoryLabel: item.category || "Pintu",
+        price: /^rp/i.test(String(item.price || "").trim()) ? item.price : "Rp" + item.price,
+        desc: item.desc || "", image: mainImg, photos: allPhotos,
+        visual: (item.category || "").toLowerCase() === "jendela" ? "window" : ((item.category || "").toLowerCase() === "kusen" ? "frame" : "door")
+      };
+    });
+  } catch (e) { console.error(e); }
+  render();
+}
+
+function render() {
+  const q = searchEl.value.toLowerCase().trim(), cat = categoryEl.value;
+  const list = catalog.filter(p => (cat === "all" || p.category === cat) && (p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)));
+  productsEl.innerHTML = list.length ? list.map(p => `<article class="product"><div class="product-visual ${p.image ? 'has-img' : p.visual}" onclick="openGallery(${p.id})">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy"><span class="zoom-badge">${p.photos.length > 1 ? '📷 ' + p.photos.length + ' Foto' : '🔍 Lihat'}</span>` : ""}<span class="visual-label">${p.categoryLabel}</span></div><div class="product-body"><div class="product-type">${p.categoryLabel}</div><h3>${p.name}</h3><div class="product-desc">${p.desc}</div><div class="price">${p.price}</div><div class="product-actions"><button class="btn" onclick="openOrder(${p.id})">Pesan produk</button><button class="btn light" onclick="askProduct(${p.id})">Tanya harga</button></div></div></article>`).join("") : `<div class="empty">Produk tidak ditemukan. Coba kata kunci atau kategori lain.</div>`;
+}
+
+function openGallery(id) {
+  const p = catalog.find(x => x.id === id);
+  if (!p || !p.photos.length) return;
+  lbPhotos = p.photos; lbIdx = 0; lbCurrentId = id;
+  document.getElementById("lbTitle").textContent = p.name;
+  document.getElementById("lbInfo").innerHTML = `<strong>${p.price}</strong> · ${p.desc}`;
+  document.getElementById("lbPrev").style.display = lbPhotos.length > 1 ? "block" : "none";
+  document.getElementById("lbNext").style.display = lbPhotos.length > 1 ? "block" : "none";
+  updateGalleryView();
+  document.getElementById("imgModal").classList.add("open");
+}
+
+function updateGalleryView() {
+  document.getElementById("lbMainImg").src = lbPhotos[lbIdx];
+  document.getElementById("lbThumbs").innerHTML = lbPhotos.length > 1 ? lbPhotos.map((src, i) => `<img src="${src}" onclick="lbIdx=${i};updateGalleryView()" style="width:54px;height:54px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === lbIdx ? '#263c30' : 'transparent'}">`).join("") : "";
+}
+
+document.getElementById("lbPrev").onclick = () => { lbIdx = (lbIdx - 1 + lbPhotos.length) % lbPhotos.length; updateGalleryView(); };
+document.getElementById("lbNext").onclick = () => { lbIdx = (lbIdx + 1) % lbPhotos.length; updateGalleryView(); };
+document.getElementById("closeImgModal").onclick = () => document.getElementById("imgModal").classList.remove("open");
+document.getElementById("imgModal").onclick = e => { if (e.target.id === "imgModal") e.currentTarget.classList.remove("open"); };
+document.getElementById("lbOrderBtn").onclick = () => { document.getElementById("imgModal").classList.remove("open"); openOrder(lbCurrentId); };
+
+function openOrder(id){const p=catalog.find(x=>x.id===id);document.getElementById("orderProduct").value=p.name;document.getElementById("orderModal").classList.add("open");document.getElementById("customerName").focus()}
+function askProduct(id){const p=catalog.find(x=>x.id===id);const msg=`Halo Jalu Mebel Blitar, saya ingin bertanya tentang ${p.name}. Kisaran harga ${p.price}. Mohon info detail ukuran, model, dan ketersediaannya.`;window.open(`https://wa.me{WA_NUMBER}?text=${encodeURIComponent(msg)}`,"_blank","noopener")}
+document.getElementById("closeModal").addEventListener("click",()=>document.getElementById("orderModal").classList.remove("open"));
+document.getElementById("orderModal").addEventListener("click",e=>{if(e.target.id==="orderModal")e.currentTarget.classList.remove("open")});
+document.getElementById("orderForm").addEventListener("submit",e=>{e.preventDefault();const v=id=>document.getElementById(id).value;const msg=`Halo Jalu Mebel Blitar, saya ingin memesan/konsultasi produk.\nProduk: ${v("orderProduct")}\nNama: ${v("customerName")}\nUkuran/spesifikasi: ${v("spec")||"-"}\nJumlah: ${v("qty")}\nCatatan: ${v("notes")||"-"}`;window.open(`https://wa.me{WA_NUMBER}?text=${encodeURIComponent(msg)}`,"_blank","noopener");document.getElementById("orderModal").classList.remove("open")});
+searchEl.addEventListener("input",render);categoryEl.addEventListener("change",render);document.getElementById("year").textContent=new Date().getFullYear();loadProducts();
+</script>
+</body></html>
