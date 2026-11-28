@@ -5,6 +5,7 @@
       "category": "Pintu",
       "price": "Rp400.000 - Rp1.200.000",
       "image": "/images/14067.jpg",
+      "gallery": [],
       "desc": "Pilihan pintu kamar dengan material kayu jati berkualitas dan kering"
     },
     {
@@ -12,6 +13,7 @@
       "category": "Pintu",
       "price": "1.800.000",
       "image": "/images/16873.jpg",
+      "gallery": [],
       "desc": "Pintu kupu tarung 120 x 200 harga 1.800.000"
     },
     {
@@ -19,7 +21,19 @@
       "category": "Pintu",
       "price": "1.800.000",
       "image": "/images/16891.jpg",
+      "gallery": [],
       "desc": "Pintu kupu tarung 120 x 200 dari kayu kering"
+    },
+    {
+      "name": "Kusen kayu jati",
+      "category": "Kusen",
+      "price": "400.000-600.000",
+      "image": "/images/35923.jpg",
+      "gallery": [
+        "/images/35921.jpg",
+        "/images/35921.jpg"
+      ],
+      "desc": "Kusen kayu jati ketebalan 6/12, bahan kayu jati kering untuk ukuran 80 x 200"
     }
   ]
 }
